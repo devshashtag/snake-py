@@ -4,6 +4,4 @@ class Board(object):
     def __init__(self, arg):
             # initialize board :
             # - create board list (numpy zeros)
-    
-
-		
+            pass
