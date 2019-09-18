@@ -1,3 +1,5 @@
+import cv2
+
 class Snake(object):
     def __init__(self, x, y, board_limit):
             # initialize snake:
