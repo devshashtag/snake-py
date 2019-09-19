@@ -4,7 +4,7 @@ import random
 
 class Snake(object):
     def __init__(self, board_limit, head_position=(0, 0), start_length=150,
-                 first_direction='6', step_size=15, speed=100):
+                 first_direction='6', step_size=10, speed=100):
         # initialize attribute snake:
         self.board_limit = board_limit
         self.start_length = start_length
@@ -39,14 +39,19 @@ class Snake(object):
             # find last tail position
             last_tail = self.positions[self.length]
             # clear last position
-            cv2.circle(board, last_tail, self.step_size//2, color, -1)
+            cv2.circle(board, last_tail, self.step_size // 2, color, -1)
         else:
             for pos in self.positions:
                 # print color snake random
                 # color = random.randint(150, 250)
                 # static color
                 color = 255
-                cv2.circle(board, tuple(pos), self.step_size//2, color, -1)
+
+                # head color
+                if pos == self.positions[0]:
+                    color = 80
+
+                cv2.circle(board, tuple(pos), self.step_size // 2, color, -1)
 
         # show board after draw circles
         cv2.imshow('Micro Robot: AI Snake Q Learning', board)
