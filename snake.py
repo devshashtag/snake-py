@@ -3,12 +3,12 @@ import random
 
 
 class Snake(object):
-    def __init__(self, board_limit, head_position=(0, 0), start_length=5,
-                 first_direction='6', step_size=5, speed=150):
+    def __init__(self, board_limit, head_position=(0, 0), start_length=150,
+                 first_direction='6', step_size=15, speed=100):
         # initialize attribute snake:
-        self.snake_limit = board_limit
+        self.board_limit = board_limit
         self.start_length = start_length
-        self._length = 0
+        self.length = 0
         self.directions = list("2468")
         # size of each part
         self.step_size = step_size
@@ -28,23 +28,25 @@ class Snake(object):
 
     def add_length(self):
         # add snake body
-        new_position = self.positions[self._length]
+        new_position = self.positions[self.length]
         self.positions.append(new_position)
-        self._length += 1
+        self.length += 1
 
     def draw(self, board, is_clear=False, color=0):
         # - draw the snake with cv2
         if is_clear:
             # Note: after clear snake draw again snake
             # find last tail position
-            last_tail = self.positions[self._length]
+            last_tail = self.positions[self.length]
             # clear last position
-            cv2.circle(board, last_tail, self.step_size, color, -1)
+            cv2.circle(board, last_tail, self.step_size//2, color, -1)
         else:
             for pos in self.positions:
-                # print color snake
-                color = random.randint(150, 250)
-                cv2.circle(board, tuple(pos), self.step_size, color, -1)
+                # print color snake random
+                # color = random.randint(150, 250)
+                # static color
+                color = 255
+                cv2.circle(board, tuple(pos), self.step_size//2, color, -1)
 
         # show board after draw circles
         cv2.imshow('Micro Robot: AI Snake Q Learning', board)
@@ -55,7 +57,7 @@ class Snake(object):
         positions_copy = self.positions.copy()
 
         # body mover( shift all location to next state)
-        del self.positions[self._length]
+        del self.positions[self.length]
 
         # head mover
         x, y = self.positions[0]
@@ -73,15 +75,29 @@ class Snake(object):
         # save new location head and append to body
         self.positions.insert(0, (x, y))
 
-        # Collision detection body snake:
+        # collision detection body snake with head snake:
         # - positions_copy : old locations of snake
         # - self.positions : updated locations of snake
         # - self.positions[0] : location head snake now
-        # - if self.positions[0] in pos : true head inside body snake
+        # - if self.positions[0] in pos :if true: head inside body snake
         if self.positions[0] in positions_copy:
             # just a log ...
-            print("\033[31m this is bad \033[m")
+            print("\033[31m u died \033[m")
             # stop move (copy is recoverd)
             self.positions = positions_copy
 
         # - limit movement inside board(game)
+        if self.dot_in_rectangle([[0, 0], self.board_limit],
+                                 self.positions[0]):
+            # stop move (copy is recoverd) Limit board
+            self.positions = positions_copy
+
+    # check snake inside limit word or not
+    def dot_in_rectangle(self, rectangle, pos):
+        if rectangle[0][0] >= pos[0] or \
+           rectangle[0][1] >= pos[1] or \
+           rectangle[1][1] <= pos[0] or \
+           rectangle[1][0] <= pos[1]:
+            return True
+        else:
+            return False
