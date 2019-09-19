@@ -2,20 +2,19 @@ import cv2
 # - - - - - - - - - - -
 from board import Board
 from snake import Snake
-from food import Food
 # - - - - - - - - - - -
 
 
 def center_position(pos):
-    return (pos[1]//2, pos[0]//2)
+    return (pos[0] // 2, pos[1] // 2)
 
 
 # initilize board
-page = Board((500, 800), 0)
+page = Board((800, 600), 0)
 
 
 center_pos = center_position(page.size_board)
-snake = Snake(page.size_board, center_pos)
+snake = Snake([(0, 0), page.size_board], center_pos)
 
 # cv2.waitKey(10000)
 
@@ -47,4 +46,3 @@ while True:
         break
 
 cv2.destroyAllWindows()
-

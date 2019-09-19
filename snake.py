@@ -1,10 +1,12 @@
 import cv2
-import random
+# - - - - - - - - - - -
+from food import Food
+# - - - - - - - - - - -
 
 
 class Snake(object):
-    def __init__(self, board_limit, head_position=(0, 0), start_length=150,
-                 first_direction='6', step_size=10, speed=100):
+    def __init__(self, board_limit, head_position=(0, 0), start_length=10,
+                 first_direction='6', step_size=20, speed=100):
         # initialize attribute snake:
         self.board_limit = board_limit
         self.start_length = start_length
@@ -19,6 +21,9 @@ class Snake(object):
         # initialize head
         self.positions = [head_position]
 
+        # food
+        self.food = Food(self.board_limit, self.step_size)
+
     def eat_food(self, food):
         # - remove food
         # - stretch body
@@ -32,14 +37,14 @@ class Snake(object):
         self.positions.append(new_position)
         self.length += 1
 
-    def draw(self, board, is_clear=False, color=0):
+    def draw(self, board, is_clear=False, clear_color=0):
         # - draw the snake with cv2
         if is_clear:
             # Note: after clear snake draw again snake
             # find last tail position
             last_tail = self.positions[self.length]
             # clear last position
-            cv2.circle(board, last_tail, self.step_size // 2, color, -1)
+            cv2.circle(board, last_tail, self.step_size // 2, clear_color, -1)
         else:
             for pos in self.positions:
                 # print color snake random
@@ -53,8 +58,10 @@ class Snake(object):
 
                 cv2.circle(board, tuple(pos), self.step_size // 2, color, -1)
 
-        # show board after draw circles
+        # show board after draw circles(body and head snake)
         cv2.imshow('Micro Robot: AI Snake Q Learning', board)
+        # draw food
+        self.food.draw(board)
 
     def move(self):
         # - move up down left right with keys (with 2,4,6,8 and arrows)
@@ -92,7 +99,7 @@ class Snake(object):
             self.positions = positions_copy
 
         # - limit movement inside board(game)
-        if self.dot_in_rectangle([[0, 0], self.board_limit],
+        if self.dot_in_rectangle(self.board_limit,
                                  self.positions[0]):
             # stop move (copy is recoverd) Limit board
             self.positions = positions_copy
@@ -101,8 +108,8 @@ class Snake(object):
     def dot_in_rectangle(self, rectangle, pos):
         if rectangle[0][0] >= pos[0] or \
            rectangle[0][1] >= pos[1] or \
-           rectangle[1][1] <= pos[0] or \
-           rectangle[1][0] <= pos[1]:
+           rectangle[1][0] <= pos[0] or \
+           rectangle[1][1] <= pos[1]:
             return True
         else:
             return False
