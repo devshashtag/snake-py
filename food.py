@@ -28,11 +28,20 @@ class Food(object):
             cv2.circle(board, self.pos, self.step_size // 2, color, -1)
 
         # show board after draw circles
-        cv2.imshow('Micro Robot: AI Snake Q Learning', board)
+        cv2.imshow('Micro Robot: Snake', board)
 
     def randomize(self):
-        # generate random location for food
-        self.pos = (random.randint(self.board_limit[0][0] + self.step_size,
-                                   self.board_limit[1][0] - self.step_size),
-                    random.randint(self.board_limit[0][0] + self.step_size,
-                                   self.board_limit[1][0] - self.step_size))
+        # location of board
+        board_x = self.board_limit[0][0] + self.step_size
+        board_y = self.board_limit[0][1] + self.step_size
+        board_width = self.board_limit[1][0] - self.step_size
+        board_height = self.board_limit[1][1] - self.step_size
+        # generate random location and free location in board
+        food_loc_x = random.randint(board_x, board_width)
+        food_loc_y = random.randint(board_y, board_height)
+        # location of food
+        self.pos = (food_loc_x, food_loc_y)
+        # print locations
+        print(board_x, board_y)
+        print(board_width, board_height)
+        print(self.pos)
