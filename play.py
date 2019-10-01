@@ -1,32 +1,27 @@
 import cv2
 # - - - - - - - - - - -
-from window import Window
+from board import Board
 from snake import Snake
 # - - - - - - - - - - -
 
-# calculate and return center position in window
-def center_position(pos):
-    return (pos[0] // 2, pos[1] // 2)
+
 
 
 # - initilize Window
 bg_color = 12
 window_size = (800, 600)
 # page for drawing objects ( array )
-window = Window(window_size, bg_color)
+board = Board(window_size, bg_color)
 
-# - center position of window
-center_pos = center_position(window.size_window)
-# - limit move items inside window
-window_limit = [(0, 0), window.size_window]
 
-snake = Snake(window_limit, center_pos, window.bg_color)
+
+snake = Snake(board)
 
 while True:
     # check move key
     if snake.direction in snake.directions:
         # clear snake  by default [color clear is bg_color]
-        snake.draw(window.window, True)
+        snake.draw(True)
 
         # increase length each move and decrease start length
         if snake.start_length > 0:
@@ -35,7 +30,9 @@ while True:
 
         # move with snake.direction variable
         snake.move()
-        snake.draw(window.window)
+        # draw snake again
+        snake.draw()
+
     # read key entered and sleep for control (speed snake)
     key = (cv2.waitKey(snake.speed) & 0xFF)
 

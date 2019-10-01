@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class Window(object):
+class Board(object):
     """window or page or board game"""
 
     def __init__(self, size_window=(800, 600), bg_color=0):

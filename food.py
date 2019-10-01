@@ -3,9 +3,9 @@ import cv2
 
 
 class Food(object):
-    def __init__(self, board_limit, step_size):
+    def __init__(self, window_limit, step_size):
         # initialize Food :
-        self.board_limit = board_limit
+        self.window_limit = window_limit
 
         # size of food(set grid game)
         self.step_size = step_size
@@ -14,34 +14,34 @@ class Food(object):
         # - set random x, y position
         self.randomize()
 
-    def draw(self, board, is_clear=False, color=0):
-        # - draw food in board
+    def draw(self, window, is_clear=False, color=0):
+        # - draw food in window
         if is_clear:
             # Note: before change location food . food must be clear
-            # clear food with back groud board color
-            cv2.circle(board, self.pos, self.step_size // 2, color, -1)
+            # clear food with backgroud window
+            cv2.circle(window, self.pos, self.step_size//2, color, -1)
         else:
             # check color is 0 change it
-            if not color:
+            if color == 0:
                 color = 180
             # draw food
-            cv2.circle(board, self.pos, self.step_size // 2, color, -1)
+            cv2.circle(window, self.pos, self.step_size//2, color, -1)
 
-        # show board after draw circles
-        cv2.imshow('Micro Robot: Snake', board)
+        # show window after draw circles
+        cv2.imshow('Micro Robot: Snake', window)
 
     def randomize(self):
-        # location of board
-        board_x = self.board_limit[0][0] + self.step_size
-        board_y = self.board_limit[0][1] + self.step_size
-        board_width = self.board_limit[1][0] - self.step_size
-        board_height = self.board_limit[1][1] - self.step_size
-        # generate random location and free location in board
-        food_loc_x = random.randint(board_x, board_width)
-        food_loc_y = random.randint(board_y, board_height)
+        # location of window
+        window_x = self.window_limit[0][0] + self.step_size
+        window_y = self.window_limit[0][1] + self.step_size
+        window_width = self.window_limit[1][0] - self.step_size
+        window_height = self.window_limit[1][1] - self.step_size
+        # generate random location and free location in window
+        food_loc_x = random.randint(window_x, window_width)
+        food_loc_y = random.randint(window_y, window_height)
         # location of food
         self.pos = (food_loc_x, food_loc_y)
         # print locations
-        print(board_x, board_y)
-        print(board_width, board_height)
+        print(window_x, window_y)
+        print(window_width, window_height)
         print(self.pos)
