@@ -6,16 +6,15 @@ from food import Food
 class Snake(object):
     """ Snake """
 
-    def __init__(self, board, start_length=1, first_direction='6',
-                 step_size=10, speed=100):
+    def __init__(self, board, start_position=(10, 10), window_limit=0,
+                 start_length=1, first_direction='6', step_size=10,
+                 speed=100):
         # window
-        # calculate and return center position in window
-        def center_position(pos):
-            return (pos[0]//2, pos[1]//2)
         # - center position of window
-        head_position = center_position(board.size_window)
+        head_position = start_position
         # - limit move items inside window
-        window_limit = [(0, 0), board.size_window]
+        if window_limit == 0:
+            window_limit = [(0, 0), board.size_window]
         # - window for draw snake
         self.board = board
         # initialize attribute snake:
@@ -37,12 +36,11 @@ class Snake(object):
         self.positions = [ head_position ]
         # length snake
         self.length = len(self.positions) - 1
+        # snake died
+        self.died = False
 
         # food
         self.food = Food(self.window_limit, self.step_size)
-        # draw food
-        self.food.draw(self.board.window)
-
 
     # eat food by snake
     def eat_food(self):
@@ -74,11 +72,8 @@ class Snake(object):
             self.score += 1
             # - generate position food
             self.food.randomize()
-            # - draw food again
-            self.food.draw(self.board.window)
-
-
-
+        # - always show food
+        self.food.draw(self.board.window)
     # add length snake
     def add_length(self):
         # add snake body
@@ -87,8 +82,7 @@ class Snake(object):
         self.positions.append(new_position)
         self.length += 1
 
-
-    # darw snake in window
+    # draw snake in window
     def draw(self, is_clear=False, clear_color=0):
         # - draw the snake with cv2
         if is_clear:
@@ -114,22 +108,22 @@ class Snake(object):
         # show window after draw circles(body and head snake)
         cv2.imshow('Micro Robot: Snake', self.board.window)
 
-
     # move snake in window
     def move(self):
         # - move up down left right with keys (with 2,4,6,8 and arrows)
         # unpack head locations for update
         x, y = self.positions[0]
-
-        # detect key and move head snake
-        if(self.direction == '8'):  # move up
-            y -= self.step_size
-        elif(self.direction == '2'):  # move down
-            y += self.step_size
-        elif(self.direction == '4'):  # move left
-            x -= self.step_size
-        elif(self.direction == '6'):  # move right
-            x += self.step_size
+        # if snake is died . dont move head so snake is hide
+        if not self.died:
+            # detect key and move head snake
+            if(self.direction == '8'):  # move up
+                y -= self.step_size
+            elif(self.direction == '2'):  # move down
+                y += self.step_size
+            elif(self.direction == '4'):  # move left
+                x -= self.step_size
+            elif(self.direction == '6'):  # move right
+                x += self.step_size
 
         # new location of head but not save in self.positions
         head_new_position = (x, y)
@@ -142,16 +136,21 @@ class Snake(object):
         # - self.positions : old locations of snake
         # - head_new_position : new location head snake at now
         # if head_new_position not in self.positions > update locations
-        if head_new_position not in self.positions and limit_check:
+        # if snake is died hide snake
+        if head_new_position not in self.positions and limit_check or self.died:
             # body mover( delete last tail[shift all locations to new locations])
             del self.positions[-1:]
             # add new location of head to shited locations
             self.positions.insert(0, head_new_position)
+            self.eat_food()
+            # if snake is died hide food
+            if self.died:
+                # - remove food
+                self.food.draw(self.board.window, True, self.board.bg_color)
         else:
             # just a log ...
             print("\033[31m u died \033[m")
-
-        self.eat_food()
+            self.died = True
 
 
     # limit checker for movment snake (window)

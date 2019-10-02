@@ -1,8 +1,10 @@
-import random
 import cv2
+import random
 
 
 class Food(object):
+    """ food """
+
     def __init__(self, window_limit, step_size):
         # initialize Food :
         self.window_limit = window_limit
@@ -45,3 +47,7 @@ class Food(object):
         print(window_x, window_y)
         print(window_width, window_height)
         print(self.pos)
+        offset=(self.step_size + (self.step_size//2))
+        if(self.pos[0] % offset != 0 and
+           self.pos[1] % offset != 0 ):
+           self.randomize()
