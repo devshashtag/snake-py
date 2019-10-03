@@ -4,11 +4,12 @@ from snake import Snake
 
 
 # - initilize Window
-bg_color = 12
 window_size = (800, 600)
+title = 'Micro Robot: Snake'
+bg_color = 12
 
 # - Window for drawing objects ( array )
-board = Board(window_size, bg_color)
+board = Board(window_size, title, bg_color)
 
 # - SNAKE (player)
 # calculate and return center position in window
@@ -20,30 +21,29 @@ window_limit = [(0, 0), board.size_window]
 
 snake = Snake(board, start_position, window_limit, 100)
 
+# - -  start game - -
 def render(snake):
     while True:
-        # check move key
-        if snake.direction in snake.directions:
-            # clear snake  by default [color clear is bg_color]
-            snake.draw(True)
+        # clear snake  by default [color clear is bg_color]
+        snake.draw(False)
+        # move with snake.direction variable
+        snake.move()
+        # draw snake again
+        snake.draw(True)
+        # - - end game - -
+        if snake.died and snake.positions[snake.length] == snake.positions[0]:
+            # clear snake
+            snake.draw(False)
+            # - remove food
+            snake.food.draw(snake.board.window, True, snake.board.bg_color)
+            # delete objects
+            del snake.food
+            del snake
+            break
 
-            # increase length each move and decrease start length
-            if snake.start_length > 0:
-                snake.start_length -= 1
-                snake.add_length()
-
-            # move with snake.direction variable
-            snake.move()
-            # draw snake again
-            snake.draw()
-            # end game
-            if snake.died and snake.positions[snake.length] == snake.positions[0]:
-                # clear snake
-                snake.draw(True)
-                break
-
-        # read key entered and sleep for control (speed snake)
-        key = chr(cv2.waitKey(snake.speed) & 0xFF)
+        snake.board.draw_window()
+        # read key and delay
+        key = snake.board.get_key(snake.speed)
 
         # action is allowed directions(p for pause)
         if key in snake.directions or key == 'p':

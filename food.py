@@ -29,9 +29,6 @@ class Food(object):
             # draw food
             cv2.circle(window, self.pos, self.step_size//2, color, -1)
 
-        # show window after draw circles
-        cv2.imshow('Micro Robot: Snake', window)
-
     def randomize(self):
         # location of window
         window_x = self.window_limit[0][0] + self.step_size
