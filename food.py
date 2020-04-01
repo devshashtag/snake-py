@@ -8,7 +8,6 @@ class Food(object):
     def __init__(self, window_limit, step_size):
         # initialize Food :
         self.window_limit = window_limit
-
         # size of food(set grid game)
         self.step_size = step_size
         # initial location
@@ -42,9 +41,9 @@ class Food(object):
         self.pos = (food_loc_x, food_loc_y)
         # just a log
         # print locations
-        print(window_x, window_y)
-        print(window_width, window_height)
-        print(self.pos)
+        # print(window_x, window_y)
+        # print(window_width, window_height)
+        # print(self.pos)
 
         offset=(self.step_size)
         if(self.pos[0] % offset != 0 and

@@ -4,7 +4,7 @@ from snake import Snake
 
 
 # - initilize Window
-window_size = (800, 600)
+window_size = (80, 60)
 title = 'Micro Robot: Snake'
 bg_color = 12
 
@@ -19,19 +19,24 @@ def center_position(pos):
 start_position = center_position(board.size_window)
 window_limit = [(0, 0), board.size_window]
 
-snake = Snake(board, start_position, window_limit, 100)
+# length snake
+start_length=20
+snake = Snake(board, start_position, window_limit, start_length)
 
 # - -  start game - -
 def render(snake):
     while True:
+
         # clear snake  by default [color clear is bg_color]
         snake.draw(False)
         # move with snake.direction variable
         snake.move()
         # draw snake again
         snake.draw(True)
+
+
         # - - end game - -
-        # if snake is died  : all body into itself : then end game
+        # if snake is died  : show effect end : then end game
         if snake.died and snake.positions[snake.length] == snake.positions[0]:
             # clear snake
             snake.draw(False)
@@ -42,25 +47,24 @@ def render(snake):
             del snake
             break
 
-        snake.board.draw_window()
+        board.draw_window()
+
         # read key and delay
-        key = snake.board.get_key(snake.speed)
+        key = board.get_key(snake.speed)
 
         # action is allowed directions(p for pause)
-        if key == 't':
-            y = int(input("Y:"))
-            x = int(input("X:"))
-            snake.positions[0] = (x,y)
-        if key in snake.directions or key == 'p':
+        if key in snake.directions or key=='p':
             snake.direction = key
+
+
         # increase speed snake
         elif (key == '+'):
             if(snake.speed > 10):
                 snake.speed -= 10
-        # decrease speed snake
+                # decrease speed snake
         elif (key == '-'):
             snake.speed += 10
-        # quit from game
+            # quit from game
         elif (key == 'q'):
             snake.speed = 1
             snake.died = True

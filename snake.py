@@ -5,9 +5,8 @@ from food import Food
 
 class Snake(object):
     """ Snake """
-
-    def __init__(self, board, start_position=(10, 10), window_limit=0,
-                 start_length=1, first_direction='6', step_size=10,
+    def __init__(self, board, start_position=(0, 10), window_limit=0,
+                 start_length=1, first_direction='6', step_size=1,
                  speed=100):
         # window
         # - center position of window
@@ -29,7 +28,7 @@ class Snake(object):
         # speed snake
         self.speed = speed
         # score snake
-        self.score = self.start_length
+        self.score = 0
         # controller head '6' = right
         self.direction = first_direction
         # initialize head
@@ -38,9 +37,9 @@ class Snake(object):
         self.length = len(self.positions) - 1
         # snake died
         self.died = False
-
         # food
         self.food = Food(self.window_limit, self.step_size)
+
 
     # eat food by snake
     def eat_food(self):
@@ -49,11 +48,10 @@ class Snake(object):
         food_y = self.food.pos[1]
         size_food = self.food.step_size
         # area food for detection
-        area_food = [
-            (food_x - size_food, food_y - size_food),
-            (food_x + size_food, food_y + size_food)
-        ]
-
+        area_food = [ (food_x - size_food,
+                       food_y - size_food),
+                      (food_x + size_food,
+                       food_y + size_food) ]
         # just a log
         # print(area_food ,' : ', end="")
         # print(self.positions[0])
@@ -65,15 +63,17 @@ class Snake(object):
         if food_detection:
             # - remove food
             self.food.draw(self.board.window, True, self.board.bg_color)
-            print("Eat Food")
+            # print("Eat Food")
             # - add length snake
             self.add_length()
             # - add score
             self.score += 1
+            print(self.score)
             # - generate position food
             self.food.randomize()
         # - always show food
         self.food.draw(self.board.window)
+
 
     # add length snake
     def add_length(self):
@@ -82,6 +82,7 @@ class Snake(object):
         new_position = self.positions[self.length]
         self.positions.append(new_position)
         self.length += 1
+
 
     # draw snake in window
     def draw(self, is_draw=True, clear_color=0):
@@ -109,16 +110,16 @@ class Snake(object):
                 # clear last position
                 cv2.circle(self.board.window, last_tail, self.step_size//2, clear_color, -1)
 
+
     # move snake in window
     def move(self):
-        # prevent snake colliding with second body
-        if self.direction in "46":
-            self.directions = self.direction + "82"
-        elif self.direction in "82":
-            self.directions = self.direction + "46"
-        # just a log
-        # print(f"\033[31m{self.directions}")
 
+        self.directions = self.possible_direciton()
+
+        print(self.possible_direciton())
+        # log
+        # print(f"\033[31m{self.directions}")
+        print(self.direction)
         # check direction is allow
         if self.direction in self.directions:
 
@@ -162,9 +163,19 @@ class Snake(object):
                 self.eat_food()
             else:
                 # just a log ...
-                print("\033[31m u died \033[m")
+                print("\033[31mu died \033[m")
                 self.speed = 1
                 self.died = True
+
+
+    def possible_direciton(self):
+        # prevent snake colliding with second body
+        if self.direction in "46":
+            return self.direction + "82"
+        elif self.direction in "82":
+            return self.direction + "46"
+        else: return []
+
 
     # limit checker for movment snake (window)
     def dot_in_rectangle(self, rectangle, pos):
