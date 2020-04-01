@@ -40,11 +40,13 @@ class Food(object):
         food_loc_y = random.randint(window_y, window_height)
         # location of food
         self.pos = (food_loc_x, food_loc_y)
+        # just a log
         # print locations
         print(window_x, window_y)
         print(window_width, window_height)
         print(self.pos)
-        offset=(self.step_size + (self.step_size//2))
+
+        offset=(self.step_size)
         if(self.pos[0] % offset != 0 and
            self.pos[1] % offset != 0 ):
            self.randomize()

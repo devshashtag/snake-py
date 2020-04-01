@@ -31,6 +31,7 @@ def render(snake):
         # draw snake again
         snake.draw(True)
         # - - end game - -
+        # if snake is died  : all body into itself : then end game
         if snake.died and snake.positions[snake.length] == snake.positions[0]:
             # clear snake
             snake.draw(False)
@@ -46,6 +47,10 @@ def render(snake):
         key = snake.board.get_key(snake.speed)
 
         # action is allowed directions(p for pause)
+        if key == 't':
+            y = int(input("Y:"))
+            x = int(input("X:"))
+            snake.positions[0] = (x,y)
         if key in snake.directions or key == 'p':
             snake.direction = key
         # increase speed snake

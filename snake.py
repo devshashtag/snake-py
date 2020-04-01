@@ -23,7 +23,7 @@ class Snake(object):
         self.start_length = start_length
 
         # 2:DOWN, 4:LEFT, 6:RIGHT, 8:UP
-        self.directions = list("2468")
+        self.directions = "6428"
         # size of each part
         self.step_size = step_size
         # speed snake
@@ -54,9 +54,9 @@ class Snake(object):
             (food_x + size_food, food_y + size_food)
         ]
 
-        # debug detection is ok
-        print(area_food ,' : ', end="")
-        print(self.positions[0])
+        # just a log
+        # print(area_food ,' : ', end="")
+        # print(self.positions[0])
 
         # food inside head snake
         food_detection = self.dot_in_rectangle(
@@ -111,6 +111,14 @@ class Snake(object):
 
     # move snake in window
     def move(self):
+        # prevent snake colliding with second body
+        if self.direction in "46":
+            self.directions = self.direction + "82"
+        elif self.direction in "82":
+            self.directions = self.direction + "46"
+        # just a log
+        # print(f"\033[31m{self.directions}")
+
         # check direction is allow
         if self.direction in self.directions:
 
