@@ -1,78 +1,43 @@
-import cv2
-# import random
-from food import Food
-
 
 class Snake(object):
     """ Snake """
-    def __init__(self, board, start_position=(0, 10), window_limit=0,
-                 start_length=1, first_direction='6', step_size=1,
-                 speed=100):
-        # window
-        # - center position of window
-        head_position = start_position
-        # - limit move items inside window
-        if window_limit == 0:
-            window_limit = [(0, 0), board.size_window]
-        # - window for draw snake
-        self.board = board
-        # initialize attribute snake:
-        self.window_limit = window_limit
-        # start length from 0 to start_length
-        self.start_length = start_length
-
-        # 2:DOWN, 4:LEFT, 6:RIGHT, 8:UP
-        self.directions = "6428"
-        # size of each part
-        self.step_size = step_size
-        # speed snake
-        self.speed = speed
+    def __init__(self, board_limit, position=(0, 0),
+                 slength=1, sdirection='6'):
+        # board limit
+        self.board_limit = board_limit
+        # start position
+        self.positions = [ position ]
+        # start direction is right by default
+        self.direction = sdirection
+        # start length snake
+        self.start_length = slength
+        # length snake
+        self.length = 0
         # score snake
         self.score = 0
-        # controller head '6' = right
-        self.direction = first_direction
-        # initialize head
-        self.positions = [ head_position ]
-        # length snake
-        self.length = len(self.positions) - 1
         # snake died
         self.died = False
-        # food
-        self.food = Food(self.window_limit, self.step_size)
+
+        # Allowed Directions
+        #       8:UP
+        #4:LEFT       6:RIGHT
+        #      2:DOWN
+        self.directions = "2468"
+        print("\033[1;33len      : ", self.length)
 
 
     # eat food by snake
-    def eat_food(self):
-        # - collision detection food and snake
-        food_x = self.food.pos[0]
-        food_y = self.food.pos[1]
-        size_food = self.food.step_size
-        # area food for detection
-        area_food = [ (food_x - size_food,
-                       food_y - size_food),
-                      (food_x + size_food,
-                       food_y + size_food) ]
-        # just a log
-        # print(area_food ,' : ', end="")
-        # print(self.positions[0])
-
-        # food inside head snake
-        food_detection = self.dot_in_rectangle(
-            area_food, self.positions[0])
-
-        if food_detection:
-            # - remove food
-            self.food.draw(self.board.window, True, self.board.bg_color)
-            # print("Eat Food")
-            # - add length snake
+    def check_food(self, board, food):
+        # collision detection food and snake
+        if food.position == self.positions[0]:
+            # find new random loaction for food
+            food.randomize(board)
+            # add length snake
             self.add_length()
-            # - add score
+            # add score
             self.score += 1
-            print(self.score)
-            # - generate position food
-            self.food.randomize()
-        # - always show food
-        self.food.draw(self.board.window)
+            # if food eated return true
+            return True
 
 
     # add length snake
@@ -84,102 +49,81 @@ class Snake(object):
         self.length += 1
 
 
-    # draw snake in window
-    def draw(self, is_draw=True, clear_color=0):
+    # draw snake in board
+    def draw(self, board, is_draw):
         # check direction is allow
         if self.direction in self.directions:
-            # - draw snake just into window(array)
+            # show
             if is_draw:
-                for pos in self.positions:
-                    # print color snake random
-                    # color = random.randint(200, 250)
-                    # static color
-                    color = 250
-                    # head color
-                    if pos == self.positions[0]:
-                        color = 180
-                    cv2.circle(self.board.window, tuple(pos),
-                            self.step_size//2, color, -1)
+                board.draw(self.positions, board.fg)
+            # hide
             else:
-                # Note: after clear snake draw again snake
-                # change clearn color to bg color
-                if clear_color == 0:
-                    clear_color = self.board.bg_color
-                # find last tail position
-                last_tail = self.positions[self.length]
-                # clear last position
-                cv2.circle(self.board.window, last_tail, self.step_size//2, clear_color, -1)
+                board.draw(self.positions, board.bg)
 
 
-    # move snake in window
+    # move snake in board
     def move(self):
 
+        # possible_direciton
         self.directions = self.possible_direciton()
 
-        print(self.possible_direciton())
-        # log
-        # print(f"\033[31m{self.directions}")
-        print(self.direction)
         # check direction is allow
         if self.direction in self.directions:
-
             # increase length each move and decrease start length
             if self.start_length > 0:
                 self.start_length -= 1
                 self.add_length()
 
-            # - move up down left right with keys (with 2,4,6,8 and arrows)
-            # unpack head locations for update
+            # move snake
+            # -------------------------------------------------
+            # unpack head location for move head
             x, y = self.positions[0]
-            # if snake is died . dont move head so snake is hide
-            if not self.died:
-                # detect key and move head snake
-                if(self.direction == '8'):  # move up
-                    y -= self.step_size
-                elif(self.direction == '2'):  # move down
-                    y += self.step_size
-                elif(self.direction == '4'):  # move left
-                    x -= self.step_size
-                elif(self.direction == '6'):  # move right
-                    x += self.step_size
+
+            # detect key and move head snake
+            # move up
+            if(self.direction  == '8'):  y -= 1
+            # move down
+            elif(self.direction == '2'): y += 1
+            # move left
+            elif(self.direction == '4'): x -= 1
+            # move right
+            elif(self.direction == '6'): x += 1
 
             # new location of head but not save in self.positions
-            head_new_position = (x, y)
+            # becase we need to know we are in board limit or not
+            moved_position = (x, y)
+            # -------------------------------------------------
 
-            # - limit movement inside window(game) false is limited movement
-            limit_check = self.dot_in_rectangle(
-                self.window_limit, head_new_position)
+            # - limit movement inside board(game) false is limited movement
+            limit_check = self.point_in_rectangle(moved_position, self.board_limit)
+            #delete last tail for shift all locations . and new location added after checks
+            del self.positions[-1:]
 
-            # collision detection body snake with head snake and window:
+            # collision detection body snake with head snake or board:
             # - self.positions : old locations of snake
-            # - head_new_position : new location head snake at now
-            # if head_new_position not in self.positions > update locations
-            # if snake is died hide snake
-            if head_new_position not in self.positions and limit_check or self.died:
-                # body mover( delete last tail[shift all locations to new locations])
-                del self.positions[-1:]
+            # - moved_position : new location head snake at now
+            # if moved_position not in self.positions
+            if moved_position not in self.positions and limit_check:
                 # add new location of head to shited locations
-                self.positions.insert(0, head_new_position)
-                self.eat_food()
+                self.positions.insert(0, moved_position)
             else:
                 # just a log ...
-                print("\033[31mu died \033[m")
-                self.speed = 1
+                print("\033[31mGAME OVER \033[m")
                 self.died = True
 
 
+    # you cant move reverse inside youself( limit movement )
     def possible_direciton(self):
         # prevent snake colliding with second body
-        if self.direction in "46":
-            return self.direction + "82"
-        elif self.direction in "82":
-            return self.direction + "46"
+        ch = self.direction
+
+        if   ch in "46": return ch + "82"
+        elif ch in "82": return ch + "46"
         else: return []
 
-
-    # limit checker for movment snake (window)
-    def dot_in_rectangle(self, rectangle, pos):
-        if rectangle[0][0] < pos[0] and rectangle[0][1] < pos[1] and \
+   # point_in_rectangle
+    def point_in_rectangle(self, pos, rectangle):
+        if rectangle[0][0] <= pos[0] and rectangle[0][1] <= pos[1] and \
            rectangle[1][0] > pos[0] and rectangle[1][1] > pos[1]:
             return True
         else:

@@ -4,32 +4,46 @@ import cv2
 class Board(object):
     """window or page or board game"""
 
-    def __init__(self, size_window=(800, 600), title='Simple Snake', bg_color=0):
-        # initialize attribute board :
-        self.size_window = size_window
-        self.bg_color = bg_color
+    def __init__(self, size=[(0, 0), (80, 60)], title='Simple Snake', bg=0, fg=255):
+        # board size
+        self.size = size
+        # board title
         self.title = title
-        # - create window array(numpy zeros)
-        # reverse window size for numpy arr (800 , 600) => (600 , 800)
-        self.window = np.zeros(self.size_window[::-1], np.uint8)
+        # background color
+        self.bg = bg
+        # forground color
+        self.fg = fg
+        # - create board array(numpy zeros)
+        # reverse board size for numpy arr (80, 60) => (60, 80)
+        self.board = np.zeros(self.size[1][::-1], np.uint8)
         # background set
-        self.clear_window()
+        self.clear()
 
-    # clear window with background
-    def clear_window(self):
-        # - Clear all items with bg_color
-        self.window[:] = self.bg_color
 
-    # show window with title (scale 10x)
-    def draw_window(self):
-        x, y  = self.size_window
+    # clear board with background
+    def clear(self):
+        # - Clear all items with bg
+        self.board[:] = self.bg
 
-        # show window
+    # show board with title (scale x)
+    def show(self, scale=10):
+        x, y  = self.size[1]
+
+        # show board
         cv2.namedWindow(self.title, cv2.WINDOW_NORMAL)
-        cv2.resizeWindow(self.title, x*10, y*10)
-        cv2.imshow(self.title, self.window)
+        cv2.resizeWindow(self.title, x*scale, y*scale)
+        cv2.imshow(self.title, self.board)
 
-    # get keys from window
-    def get_key(self, delay):
-        # read key entered and sleep for fps
-        return chr(cv2.waitKey(delay) & 0xFF)
+
+    # draw a point in board
+    def draw(self, positions, color):
+        if type(positions) == list:
+            for position in positions:
+                cv2.circle(self.board, tuple(position), 0, color, 1)
+        else:
+            position = positions
+            cv2.circle(self.board, tuple(position), 0, color, 1)
+
+    # return free sections in board
+    def freeSections(self):
+        return list(zip(*np.where(self.board == self.bg)[::-1]))
