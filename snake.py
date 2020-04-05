@@ -62,36 +62,21 @@ class Snake(object):
     def move(self):
 
         # possible_direciton
-        self.directions = self.possible_direciton()
-
+        pos_dir = self.possible_direcitons()
+        self.directions = pos_dir if pos_dir else self.directions
         # check direction is allow
         if self.direction in self.directions:
+
             # increase length each move and decrease start length
             if self.start_length > 0:
                 self.start_length -= 1
                 self.add_length()
 
-            # move snake
-            # unpack head location for move head
-            x, y = self.positions[0]
-
-            # detect key and move head snake
-            # move up
-            if(self.direction  == '8'):  y -= 1
-            # move down
-            elif(self.direction == '2'): y += 1
-            # move left
-            elif(self.direction == '4'): x -= 1
-            # move right
-            elif(self.direction == '6'): x += 1
-
-            # new location of head but not save in self.positions
-            # becase we need to know we are in board limit or not
-            new_position = (x, y)
+            # next position
+            new_position = self.next_position(self.positions[0], self.direction)
 
             # - limit movement inside board(game) false is limited movement
             limit_check = self.point_in_rectangle(new_position, self.board_limit)
-
             # collision detection body snake with head snake or board:
             # - self.positions : old locations of snake
             # - moved_position : new location head snake at now
@@ -107,20 +92,32 @@ class Snake(object):
                 print("\033[31mGAME OVER \033[m")
                 self.died = True
 
+    def next_position(self, position, direction):
+        # next directions
+        y,x = position
+        if  (direction == '8'): y -= 1 # move up
+        elif(direction == '2'): y += 1 # move down
+        elif(direction == '4'): x -= 1 # move left
+        elif(direction == '6'): x += 1 # move right
+        return (y,x)
 
     # you cant move reverse inside youself( limit movement )
-    def possible_direciton(self):
+    def possible_direcitons(self):
         # prevent snake colliding with second body
         ch = self.direction
-
-        if   ch in "46": return ch + "82"
-        elif ch in "82": return ch + "46"
-        else: return []
+        if ch in "46":
+            return ch + "82"
+        elif ch in "82":
+            return ch + "46"
+        else:
+            return ""
 
    # point_in_rectangle
     def point_in_rectangle(self, pos, rectangle):
-        if rectangle[0][0] <= pos[0] and rectangle[0][1] <= pos[1] and \
-           rectangle[1][0] > pos[0] and rectangle[1][1] > pos[1]:
+        if  rectangle[0][0] <= pos[0] and \
+            rectangle[0][1] <= pos[1] and \
+            rectangle[1][0] >  pos[0] and \
+            rectangle[1][1] >  pos[1] :
             return True
         else:
             return False
