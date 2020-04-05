@@ -9,67 +9,57 @@ size = [(0, 0), (80, 60)]
 # board title
 title = 'A simple AI Snake'
 # range ( 0, 255 )
-background = 12
+background = 0
+foreground = 250
 # - Window for drawing objects ( array )
-board = Board(size, title, background)
-
+board = Board(size, title, background, foreground)
 
 # SNAKE
 # start position
 sposition=(1, 1)
-# objects cant exit from this border
-board_limit = board.size
 # start length snake
-slength=50
+slength=4
 # - Snake
-snake = Snake(board_limit, sposition, slength)
-
+snake = Snake(board, sposition, slength)
 
 # Foods
-food = Food()
-food.randomize(board)
+food = Food(board)
+# random location
+food.randomize()
 
 # game functions
-
 # wait for key or end delay
-def getch_or_delay(time):
+def get_key(wait):
     # read key entered or sleep for end time
-    return chr(cv2.waitKey(time) & 0xFF)
+    return chr(cv2.waitKey(wait) & 0xFF)
 
 # game starter
 def render(snake):
 
     game_speed=300
-    scale = 10
+    scale = 30
+
     while True:
         #--------------------------------------------------
         # check food need eated or not . always use this function after showing snake
-        snake.check_food(board, food)
-
+        snake.check_food(food)
         # clear snake  by default [color clear is board.bg ]
-        snake.draw(board, False)
-
+        snake.draw(False)
         # move with snake.direction variable
         snake.move()
-
         # game over
         if snake.died: break
-
         # draw snake again
-        snake.draw(board, True)
+        snake.draw(True)
+        food.draw(True)
 
-        # display board
         board.show(scale)
-        #---------------------LOGS-------------------------
-        print("\033[1;33mpossible direction : ", list(snake.possible_direciton()) ,"=> now " ,snake.direction)
-        print("\033[1;33mmy length          : ",  snake.length, "Score: ",snake.score)
-        #--------------------------------------------------
         # read key and delay
-        key = getch_or_delay(game_speed)
+        key = get_key(game_speed)
 
         # is allowed directions ?(p for pause)
         if key in snake.directions or key == 'p':
-             snake.direction = key
+            snake.direction = key
         # increase gane speed
         elif key == '+' and  game_speed > 10: game_speed -= 10
         # decrease speed snake
@@ -84,5 +74,4 @@ def render(snake):
 
 
 render(snake)
-
 cv2.destroyAllWindows()

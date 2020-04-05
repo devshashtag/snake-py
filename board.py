@@ -4,7 +4,7 @@ import cv2
 class Board(object):
     """window or page or board game"""
 
-    def __init__(self, size=[(0, 0), (80, 60)], title='Simple Snake', bg=0, fg=255):
+    def __init__(self, size=[(0, 0), (80, 60)], title='Simple Snake', bg=0, fg=1):
         # board size
         self.size = size
         # board title
@@ -36,7 +36,10 @@ class Board(object):
 
 
     # draw a point in board
-    def draw(self, positions, color):
+    def draw(self, positions, is_draw):
+        # chenge color to gray scale
+        color = self.fg if is_draw else self.bg
+
         if type(positions) == list:
             for position in positions:
                 cv2.circle(self.board, tuple(position), 0, color, 1)
@@ -44,6 +47,8 @@ class Board(object):
             position = positions
             cv2.circle(self.board, tuple(position), 0, color, 1)
 
+
     # return free sections in board
-    def freeSections(self):
-        return list(zip(*np.where(self.board == self.bg)[::-1]))
+    def free(self, revert=False):
+        free_block = self.fg if revert else self.bg
+        return list(zip(*np.where(self.board == free_block)[::-1]))

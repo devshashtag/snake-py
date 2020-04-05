@@ -1,10 +1,12 @@
 
 class Snake(object):
     """ Snake """
-    def __init__(self, board_limit, position=(0, 0),
+    def __init__(self, board, position=(0, 0),
                  slength=1, sdirection='6'):
+        # board
+        self.board = board
         # board limit
-        self.board_limit = board_limit
+        self.board_limit = board.size
         # start position
         self.positions = [ position ]
         # start direction is right by default
@@ -23,15 +25,14 @@ class Snake(object):
         #4:LEFT       6:RIGHT
         #      2:DOWN
         self.directions = "2468"
-        print("\033[1;33len      : ", self.length)
 
 
     # eat food by snake
-    def check_food(self, board, food):
+    def check_food(self, food):
         # collision detection food and snake
         if food.position == self.positions[0]:
             # find new random loaction for food
-            food.randomize(board)
+            food.randomize()
             # add length snake
             self.add_length()
             # add score
@@ -50,15 +51,11 @@ class Snake(object):
 
 
     # draw snake in board
-    def draw(self, board, is_draw):
+    def draw(self, is_draw):
         # check direction is allow
         if self.direction in self.directions:
-            # show
-            if is_draw:
-                board.draw(self.positions, board.fg)
-            # hide
-            else:
-                board.draw(self.positions, board.bg)
+            #show and hide by is_draw
+            self.board.draw(self.positions, is_draw)
 
 
     # move snake in board
@@ -75,7 +72,6 @@ class Snake(object):
                 self.add_length()
 
             # move snake
-            # -------------------------------------------------
             # unpack head location for move head
             x, y = self.positions[0]
 
@@ -91,21 +87,21 @@ class Snake(object):
 
             # new location of head but not save in self.positions
             # becase we need to know we are in board limit or not
-            moved_position = (x, y)
-            # -------------------------------------------------
+            new_position = (x, y)
 
             # - limit movement inside board(game) false is limited movement
-            limit_check = self.point_in_rectangle(moved_position, self.board_limit)
-            #delete last tail for shift all locations . and new location added after checks
-            del self.positions[-1:]
+            limit_check = self.point_in_rectangle(new_position, self.board_limit)
 
             # collision detection body snake with head snake or board:
             # - self.positions : old locations of snake
             # - moved_position : new location head snake at now
             # if moved_position not in self.positions
-            if moved_position not in self.positions and limit_check:
+            if new_position not in self.positions and limit_check:
                 # add new location of head to shited locations
-                self.positions.insert(0, moved_position)
+                self.positions.insert(0, new_position)
+                # delete last tail for shift all locations
+                # and new location will be added after checks
+                self.positions.pop()
             else:
                 # just a log ...
                 print("\033[31mGAME OVER \033[m")
