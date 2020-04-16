@@ -1,7 +1,7 @@
 
 class Snake(object):
     """ Snake """
-    def __init__(self, board, position=(0, 0),
+    def __init__(self ,board, position=(0, 0),
                  slength=1, sdirection='6'):
         # board
         self.board = board
@@ -19,27 +19,24 @@ class Snake(object):
         self.score = 0
         # snake died
         self.died = False
-
         # Allowed Directions
         #       8:UP
         #4:LEFT       6:RIGHT
         #      2:DOWN
         self.directions = "2468"
 
-
     # eat food by snake
     def check_food(self, food):
         # collision detection food and snake
         if food.position == self.positions[0]:
             # find new random loaction for food
-            food.randomize()
             # add length snake
+            food.randomize()
             self.add_length()
             # add score
             self.score += 1
             # if food eated return true
             return True
-
 
     # add length snake
     def add_length(self):
@@ -49,7 +46,6 @@ class Snake(object):
         self.positions.append(new_position)
         self.length += 1
 
-
     # draw snake in board
     def draw(self, is_draw):
         # check direction is allow
@@ -57,24 +53,19 @@ class Snake(object):
             #show and hide by is_draw
             self.board.draw(self.positions, is_draw)
 
-
     # move snake in board
     def move(self):
-
         # possible_direciton
         pos_dir = self.possible_direcitons()
         self.directions = pos_dir if pos_dir else self.directions
         # check direction is allow
         if self.direction in self.directions:
-
             # increase length each move and decrease start length
             if self.start_length > 0:
                 self.start_length -= 1
                 self.add_length()
-
             # next position
             new_position = self.next_position(self.positions[0], self.direction)
-
             # - limit movement inside board(game) false is limited movement
             limit_check = self.point_in_rectangle(new_position, self.board_limit)
             # collision detection body snake with head snake or board:
@@ -91,6 +82,7 @@ class Snake(object):
                 # just a log ...
                 print("\033[31mGAME OVER \033[m")
                 self.died = True
+
 
     def next_position(self, position, direction):
         # next directions

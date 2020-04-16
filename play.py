@@ -70,6 +70,7 @@ def render(snake):
         MAP = board.board
         # free target
         MAP[food_pos] = board.bg
+        MAP[snake_head] = board.bg
 
         if paths == []:
             paths = get_paths(MAP, snake_head, food_pos, key)
@@ -136,19 +137,23 @@ def allowed_action(snake,board,key):
 
 
 def get_paths(board, src, dest, key):
-    path_symbols = []
+    keys = []
     try:
         path = ai.path(board, src, dest)
         print("==========================")
         print(src, dest, key)
-        path_symbols = ai.convert_to_symbol(path)
+        keys = ai.convert_paths_to_keys(path)
     except Exception as e:
         print(e)
 
-    if path_symbols == []:
-        path_symbols = [ key ]
-    print(f"next actions: { path_symbols }")
-    return path_symbols
+    if keys == []:
+        keys = [ key ]
 
-render(snake)
-cv2.destroyAllWindows()
+    print(f"next actions: { keys }")
+    return keys
+
+if __name__ == "__main__":
+    render(snake)
+    cv2.destroyAllWindows()
+
+print(__name__)
